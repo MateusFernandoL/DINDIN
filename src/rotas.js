@@ -1,7 +1,7 @@
 const express = require('express')
 const rotas = express()
 
-// const { } = require('./controladores/usuarios');
+const { detalharUsuario } = require('./controladores/usuarios');
 
 const verificarUsuarioLogado = require('./intermediarios/autorizacao');
 
@@ -12,7 +12,8 @@ const verificarUsuarioLogado = require('./intermediarios/autorizacao');
 // rotas.post('/cadastrarUsuario', cadastrarUsuario);
 // rotas.post('/login', login);
 
-rotas.use(verificarUsuarioLogado);
+// rotas.use(verificarUsuarioLogado);
 
+rotas.get('/usuario', detalharUsuario);
 
 module.exports = rotas

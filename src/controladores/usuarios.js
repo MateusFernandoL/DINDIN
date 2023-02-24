@@ -48,7 +48,29 @@ const cadastrarUsuario = async (req, res) => {
     }
 }
 
+const detalharUsuario = async (req, res) => {
+    const {autorization} = req.headers;
+    
+    try {
+        const token = autorization.split(" ")[1];
+    
+        const { idToken } = jwt.verify(token, senhaJwt);
+    
+        const acharUsuario = await pool.query('SELECT * FROM usuarios WHERE id = $1', [idToken]);
+    
+        const {id, nome, email} = acharUsuario.rows
+        
+        return res.status(200).json({
+            id,
+            nome,
+            email
+        })
+    } catch (error) {
+        return res.status(500).json({mensagem: "Erro interno do servidor"})
+    }
+}
+
 module.exports = {
     cadastrarUsuario,
-    
+    detalharUsuario
 }
