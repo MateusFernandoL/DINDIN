@@ -64,36 +64,27 @@ const login = async (req, res) => {
     }
 }
 
-
-//rota detalhar usuário
 const detalharUsuario = async (req, res) => {
+    const {authorization} = req.headers;
     
+    // o token foi gerado, vc pode acessá-lo pela propriedade 'tokenUsuario' 
+    // console.log(tokenUsuario)
     
-    
-    return res.status(200).json("Ok")
-
-}
-
-const detalharUsuario = async (req, res) => {
-    const {autorization} = req.headers;
-    
-    //o token foi gerado, vc pode acessá-lo pela propriedade 'tokenUsuario' 
-    console.log(tokenUsuario)
-
     try {
-        const token = autorization.split(" ")[1];
+        const token = authorization.split(' ')[1];
     
-        const { idToken } = jwt.verify(token, senhaJwt);
+        const idToken = jwt.verify(token, senhaJwt);
     
-        const acharUsuario = await pool.query('SELECT * FROM usuarios WHERE id = $1', [idToken]);
-    
-        const {id, nome, email} = acharUsuario.rows
-        
+        const acharUsuario = await pool.query('SELECT * FROM usuarios WHERE id = $1', [idToken.id]);
+
+        const {id, nome, email, } = acharUsuario.rows[0]
+
         return res.status(200).json({
             id,
             nome,
             email
-        })
+        });
+
     } catch (error) {
         return res.status(500).json({mensagem: "Erro interno do servidor"})
     }
