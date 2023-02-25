@@ -3,21 +3,6 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const senhaJwt = require('../senhaJwt');
 
-// Resposta
-// Em caso de sucesso, deveremos enviar no corpo (body) da resposta o conteúdo do usuário cadastrado, 
-// incluindo seu respectivo id e excluindo a senha criptografada. Em caso de falha na validação, a resposta deverá possuir status code apropriado, 
-// e em seu corpo (body) deverá possuir um objeto com uma propriedade mensagem que deverá possuir como valor um texto explicando o motivo da falha.
-
-// REQUISITOS OBRIGATÓRIOS
-
-// Validar os campos obrigatórios:
-// nome
-// email
-// senha
-// Validar se o e-mail informado já existe
-// Criptografar a senha antes de persistir no banco de dados
-// Cadastrar o usuário no banco de dados
-
 const cadastrarUsuario = async (req, res) => {
     const { nome, email, senha } = req.body
     
@@ -39,7 +24,7 @@ const cadastrarUsuario = async (req, res) => {
         
         const novoUsuario = await pool.query('insert into usuarios (nome, email, senha) values ($1, $2, $3) returning *', 
         [nome, email, senhaCriptografada])
-//retirar a senhaCriptografada
+//retirar a senhaCriptografada do retorno
 
         return res.status(200).json(novoUsuario)
 
