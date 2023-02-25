@@ -9,33 +9,77 @@ const cadastrarUsuario = async (req, res) => {
     if(!nome || !email || !senha) {
         return res.status(400).json({mensagem: "Informe o nome, email e senha." })
     }
-
+    
     try {
-        const resultado = await pool.query(
-            "select * from usuarios where email = $1", 
-            [email]
-        )
-        
-        if(resultado) {
-            return res.status(400).json({mensagem: "O email informado já está sendo utilizado, informe outro email."})
+        const emailExiste = await pool.query('select * from usuarios where email = $1', [email])
+
+        if(emailExiste.rowCount > 0) {
+            return res.status(400).json({mensagem: "Já existe usuário cadastrado com o e-mail informado."})
         }
 
         const senhaCriptografada = await bcrypt.hash(senha, 10)
         
-        const novoUsuario = await pool.query('insert into usuarios (nome, email, senha) values ($1, $2, $3) returning *', 
-        [nome, email, senhaCriptografada])
-//retirar a senhaCriptografada do retorno
+        const { rows } = await pool.query(
+            'insert into usuarios (nome, email, senha) values ($1, $2, $3) returning *', 
+            [nome, email, senhaCriptografada]
+        )
+        
+        const { senha: _, ...usuario } = rows[0] 
 
-        return res.status(200).json(novoUsuario)
+        return res.status(200).json(usuario)
 
     } catch (error) {
         return res.status(500).json({mensagem: "Erro interno do servidor"})
     }
 }
 
+const login = async (req, res) => {
+    const { email, senha } = req.body
+
+    if(!email || !senha) {
+        return res.status(400).json({mensagem: "Informe o email e senha." })
+    }
+    try {
+        const usuario = await pool.query('select * from usuarios where email = $1', [email])
+
+        if(usuario.rowCount === 0) {
+            return res.status(400).json({mensagem: "Email ou senha inválidos."})
+        }
+
+        const senhaValida = await bcrypt.compare(senha, usuario.rows[0].senha)
+
+        if(!senhaValida) {
+            return res.status(400).json({mensagem: "Email ou senha inválidos"})
+        }
+
+        const token = jwt.sign({id: usuario.rows[0].id}, senhaJwt, {expiresIn: '1d'})
+
+        const { senha: _, ...usuarioLogado} = usuario.rows[0]
+               
+        return res.status(200).json({ usuario: usuarioLogado, token})
+
+    } catch (error) {
+        console.log(error.message)
+        return res.status(500).json({mensagem: "Erro interno do servidor"})
+    }
+}
+
+
+//rota detalhar usuário
+const detalharUsuario = async (req, res) => {
+    
+    
+    
+    return res.status(200).json("Ok")
+
+}
+
 const detalharUsuario = async (req, res) => {
     const {autorization} = req.headers;
     
+    //o token foi gerado, vc pode acessá-lo pela propriedade 'tokenUsuario' 
+    console.log(tokenUsuario)
+
     try {
         const token = autorization.split(" ")[1];
     
@@ -57,5 +101,6 @@ const detalharUsuario = async (req, res) => {
 
 module.exports = {
     cadastrarUsuario,
+    login,
     detalharUsuario
 }
