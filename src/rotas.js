@@ -9,10 +9,12 @@ const verificarUsuarioLogado = require('./intermediarios/autorizacao');
 //rotas
 
 rotas.post('/usuario', usuarios.cadastrarUsuario);
-rotas.post('/login', usuarios.login );
+rotas.post('/login', usuarios.login);
 
 rotas.use(verificarUsuarioLogado);
 
-rotas.get('/usuario', usuarios.detalharUsuario ); // fica a vontade pra alterar
+rotas.get('/usuario', usuarios.detalharUsuario);
 rotas.put('/usuario', usuarios.atualizarUsuario);
+rotas.get('/categoria', usuarios.listarCategorias)
+
 module.exports = rotas
