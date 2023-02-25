@@ -11,8 +11,8 @@ const verificarUsuarioLogado = require('./intermediarios/autorizacao');
 rotas.post('/usuario', usuarios.cadastrarUsuario);
 rotas.post('/login', usuarios.login );
 
-// rotas.use(verificarUsuarioLogado);
+rotas.use(verificarUsuarioLogado);
 
 rotas.get('/usuario', usuarios.detalharUsuario ); // fica a vontade pra alterar
-
+rotas.put('/usuario', usuarios.atualizarUsuario);
 module.exports = rotas
