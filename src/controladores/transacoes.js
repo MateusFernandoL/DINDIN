@@ -43,10 +43,14 @@ const cadastarTransacao = async (req, res) => {
             [descricao, valor, data, categoria_id, tokenUsuario.id, tipo]
         )
 
+        const categoria = await pool.query('SELECT descricao from categorias where id = $1', [categoria_id])
+
+        inserirTransacao.rows[0].categoria_nome = categoria.rows[0].descricao
+
         return res.status(201).json(inserirTransacao.rows[0])
 
     } catch (error) {
-        return res.status(500).json({ mensagem: "Erro interno do servidor" })
+        return res.status(500).json({ mensagem: 'Erro interno do servidor' })
     }
 }
 
