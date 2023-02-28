@@ -91,7 +91,6 @@ const atualizarTransacao = async (req, res) => {
     }
 }
 
-
 const detalharTransacao = async (req, res) => {
     const { id } = req.params
 
