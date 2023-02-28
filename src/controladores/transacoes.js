@@ -39,9 +39,9 @@ const cadastarTransacao = async (req, res) => {
             return res.status(400).json({ mensagem: "A categoria informada não existe, informe outra categoria." })
         }
 
-        const inserirTransacao = await pool.query(`INSERT INTO transacoes (descricao, valor, data, categoria_id, usuario_id, tipo) 
+        const inserirTransacao = await pool.query(`INSERT INTO transacoes (tipo, descricao, valor, data, usuario_id, categoria_id) 
             VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-            [descricao, valor, data, categoria_id, tokenUsuario.id, tipo]
+            [tipo, descricao, valor, data, tokenUsuario.id, categoria_id]
         )
 
         const categoria = await pool.query('SELECT descricao from categorias where id = $1', [categoria_id])
