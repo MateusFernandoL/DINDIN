@@ -80,7 +80,7 @@ const atualizarTransacao = async (req, res) => {
             return res.status(400).json({ mensagem: "Tipo inválido" });
         }
 
-        const alterecao = await pool.query(`
+        const alteracao = await pool.query(`
             UPDATE transacoes SET descricao = $1, valor = $2, data = $3, categoria_id = $4, tipo = $5 
             WHERE id = $6 AND usuario_id = $7`, [descricao, valor, data, categoria_id, tipo, id, tokenUsuario.id]
         );
