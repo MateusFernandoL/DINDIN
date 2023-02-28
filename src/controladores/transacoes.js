@@ -134,7 +134,21 @@ const obterExtrato = async (req, res) => {
         return res.status(500).json({ mensagem: 'Erro interno do servidor' })
     }
 }
+// SELECT SUM(valor) FROM transacoes WHERE usuario_id = 1 AND TIPO = 'entrada'; PARA OBTER SOMA DOS REGISTROS;
 
+const excluirTransacao = async (req, res) => {
+    const { id } = req.params;
+
+    const validarId = await pool.query('SELECT id FROM transacoes WHERE id = $1 AND usuario_id = $2', [id, tokenUsuario.id]);
+
+    if (validarId.rowCount == 0) {
+        return res.status(404).json({ mensagem: "Transação não encontrada." });
+    }
+
+    const deletarTransacao = await pool.query('DELETE FROM transacoes WHERE id = $1 AND usuario_id = $2', [id, tokenUsuario.id]);
+
+    return res.status(200).json();
+}
 
 module.exports = {
     listarCategorias,
@@ -142,5 +156,6 @@ module.exports = {
     listarTransacoes,
     atualizarTransacao,
     detalharTransacao,
+    excluirTransacao,
     obterExtrato
 }
