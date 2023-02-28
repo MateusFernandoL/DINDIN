@@ -55,8 +55,45 @@ const cadastarTransacao = async (req, res) => {
     }
 }
 
+const atualizarTransacao = async (req, res) => {
+    const { id } = req.params;
+    const { descricao, valor, data, categoria_id, tipo } = req.body;
+
+    try {
+        if (!descricao || !valor || !data || !categoria_id || !tipo) {
+            return res.status(400).json({ mensagem: "Todos os campos obrigatórios devem ser informados." })
+        }
+
+        const validarIdTransacao = await pool.query('SELECT * FROM transacoes WHERE id = $1 AND usuario_id = $2', [id, tokenUsuario.id]);
+
+        if (validarIdTransacao.rowCount == 0) {
+            return res.status(404).json({ mensagem: "Transação não encontrada" });
+        }
+
+        const validarCategoria = await pool.query('SELECT * FROM categorias WHERE id = $1', [categoria_id]);
+
+        if (!validarCategoria.rows[0]) {
+            return res.status(404).json({ mensagem: "Categoria informada não existe" });
+        }
+
+        if (tipo !== "entrada" && tipo !== "saida") {
+            return res.status(400).json({ mensagem: "Tipo inválido" });
+        }
+
+        const alterecao = await pool.query(`
+            UPDATE transacoes SET descricao = $1, valor = $2, data = $3, categoria_id = $4, tipo = $5 
+            WHERE id = $6 AND usuario_id = $7`, [descricao, valor, data, categoria_id, tipo, id, tokenUsuario.id]
+        );
+
+        return res.status(200).json();
+    } catch (error) {
+        return res.status(500).json({ mensagem: 'Erro interno do servidor' });
+    }
+}
+
 module.exports = {
     listarCategorias,
     cadastarTransacao,
-    listarTransacoes
+    listarTransacoes,
+    atualizarTransacao
 }
