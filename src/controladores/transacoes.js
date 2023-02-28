@@ -2,6 +2,7 @@ const pool = require('../conexao');
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const senhaJwt = require('../senhaJwt');
+
 const listarCategorias = async (req, res) => {
     try {
         const categorias = await pool.query('SELECT * FROM categorias')

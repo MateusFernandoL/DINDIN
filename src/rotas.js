@@ -18,7 +18,7 @@ rotas.use(verificarUsuarioLogado);
 rotas.get('/usuario', usuarios.detalharUsuario);
 rotas.put('/usuario', usuarios.atualizarUsuario);
 rotas.get('/categoria', transacoes.listarCategorias)
-// rotas.get('/transacao', transacoes.listarTransacoes);
+rotas.get('/transacao', transacoes.listarTransacoes);
 rotas.post('/transacao', transacoes.cadastarTransacao);
 
 module.exports = rotas
