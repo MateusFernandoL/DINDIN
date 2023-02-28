@@ -28,8 +28,8 @@ const cadastarTransacao = async (req, res) => {
         return res.status(400).json({ "mensagem": "Todos os campos obrigatórios devem ser informados." })
     }
 
-    if (tipo !== "entrada" && tipo !== "saída") {
-        res.status(400).json({ mensagem: "Informe o tipo de transação (entrada ou saída)." })
+    if (tipo !== "entrada" && tipo !== "saida") {
+        res.status(400).json({ mensagem: "Informe o tipo de transação (entrada ou saida)." })
     }
 
     try {
@@ -91,9 +91,56 @@ const atualizarTransacao = async (req, res) => {
     }
 }
 
+
+const detalharTransacao = async (req, res) => {
+    const { id } = req.params
+
+    try {
+        const encontrarTransacoes = await pool.query('select * from transacoes where id = $1 AND usuario_id = $2', [id, tokenUsuario.id])
+
+        if (encontrarTransacoes.rowCount === 0) {
+            return res.status(400).json({ "mensagem": "Transação não encontrada." })
+        }
+
+        const categoria = await pool.query('SELECT descricao from categorias where id = $1', [id])
+        encontrarTransacoes.rows[0].categoria_nome = categoria.rows[0].descricao
+
+        return res.status(200).json(encontrarTransacoes.rows[0])
+
+    } catch (error) {
+        return res.status(500).json({ mensagem: 'Erro interno do servidor' })
+    }
+}
+
+
+const obterExtrato = async (req, res) => {
+    try {
+        const somarSaida = await pool.query('select tipo, valor from transacoes where usuario_id = $1', [tokenUsuario.id])
+
+        let saida = 0
+        let entrada = 0
+        for (let i of somarSaida.rows) {
+            if (i.tipo === 'saida') {
+                saida += i.valor
+
+            } else if (i.tipo === 'entrada') {
+                entrada += i.valor
+            }
+        }
+
+        return res.status(200).json({ entrada: entrada, saida: saida })
+
+    } catch (error) {
+        return res.status(500).json({ mensagem: 'Erro interno do servidor' })
+    }
+}
+
+
 module.exports = {
     listarCategorias,
     cadastarTransacao,
     listarTransacoes,
-    atualizarTransacao
+    atualizarTransacao,
+    detalharTransacao,
+    obterExtrato
 }

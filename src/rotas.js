@@ -20,6 +20,9 @@ rotas.put('/usuario', usuarios.atualizarUsuario);
 rotas.get('/categoria', transacoes.listarCategorias)
 rotas.get('/transacao', transacoes.listarTransacoes);
 rotas.post('/transacao', transacoes.cadastarTransacao);
+rotas.get('/transacao/extrato', transacoes.obterExtrato);
 rotas.put('/transacao/:id', transacoes.atualizarTransacao);
+rotas.get('/transacao/:id', transacoes.detalharTransacao);
+
 
 module.exports = rotas
