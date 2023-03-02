@@ -14,10 +14,37 @@ const listarCategorias = async (req, res) => {
 }
 
 const listarTransacoes = async (req, res) => {
-    const transacoesUsuario = await pool.query(`SELECT t.id, t.tipo, t.descricao, t.valor, t.data, t.usuario_id, t.categoria_id, c.descricao as categoria_nome 
-    FROM transacoes t JOIN categorias c ON t.usuario_id = c.id WHERE t.usuario_id = $1`, [tokenUsuario.id]);
+    const { filtro } = req.query;
+    try {
+        if (typeof filtro == 'object') {
+            const retornoFiltrado = [];
 
-    return res.status(200).json(transacoesUsuario.rows)
+            for (let objeto of filtro) {
+                const transacoesUsuario = await pool.query(`SELECT t.id, t.tipo, t.descricao, t.valor, t.data, t.usuario_id, t.categoria_id, c.descricao as categoria_nome 
+                    FROM transacoes t JOIN categorias c ON t.categoria_id = c.id  
+                    WHERE t.usuario_id = $1 AND c.descricao ILIKE $2;`, [tokenUsuario.id, objeto]
+                );
+                retornoFiltrado.push(...transacoesUsuario.rows);
+            }
+            return res.status(200).json(retornoFiltrado);
+
+        } else if (typeof filtro == 'string') {
+            const transacoesUsuario = await pool.query(`SELECT t.id, t.tipo, t.descricao, t.valor, t.data, t.usuario_id, t.categoria_id, c.descricao as categoria_nome 
+                FROM transacoes t JOIN categorias c ON t.categoria_id = c.id  
+                WHERE t.usuario_id = $1 AND c.descricao ILIKE $2;`, [tokenUsuario.id, filtro]
+            );
+            return res.status(200).json(transacoesUsuario.rows);
+
+        } else if (!filtro) {
+            const transacoesUsuario = await pool.query(`SELECT t.id, t.tipo, t.descricao, t.valor, t.data, t.usuario_id, t.categoria_id, c.descricao as categoria_nome 
+                FROM transacoes t JOIN categorias c ON t.categoria_id = c.id  WHERE t.usuario_id = $1;`, [tokenUsuario.id]
+            );
+
+            return res.status(200).json(transacoesUsuario.rows);
+        }
+    } catch (error) {
+        return res.status(500).json({ mensagem: "Erro interno do servidor" });
+    }
 }
 
 const cadastarTransacao = async (req, res) => {
@@ -111,7 +138,6 @@ const detalharTransacao = async (req, res) => {
     }
 }
 
-
 const obterExtrato = async (req, res) => {
     try {
         const somarSaida = await pool.query('select tipo, valor from transacoes where usuario_id = $1', [tokenUsuario.id])
@@ -133,20 +159,22 @@ const obterExtrato = async (req, res) => {
         return res.status(500).json({ mensagem: 'Erro interno do servidor' })
     }
 }
-// SELECT SUM(valor) FROM transacoes WHERE usuario_id = 1 AND TIPO = 'entrada'; PARA OBTER SOMA DOS REGISTROS;
 
 const excluirTransacao = async (req, res) => {
     const { id } = req.params;
+    try {
+        const validarId = await pool.query('SELECT id FROM transacoes WHERE id = $1 AND usuario_id = $2', [id, tokenUsuario.id]);
 
-    const validarId = await pool.query('SELECT id FROM transacoes WHERE id = $1 AND usuario_id = $2', [id, tokenUsuario.id]);
+        if (validarId.rowCount == 0) {
+            return res.status(404).json({ mensagem: "Transação não encontrada." });
+        }
 
-    if (validarId.rowCount == 0) {
-        return res.status(404).json({ mensagem: "Transação não encontrada." });
+        const deletarTransacao = await pool.query('DELETE FROM transacoes WHERE id = $1 AND usuario_id = $2', [id, tokenUsuario.id]);
+
+        return res.status(200).json();
+    } catch (error) {
+        return res.status(500).json({ mensagem: 'Erro interno do servidor' });
     }
-
-    const deletarTransacao = await pool.query('DELETE FROM transacoes WHERE id = $1 AND usuario_id = $2', [id, tokenUsuario.id]);
-
-    return res.status(200).json();
 }
 
 module.exports = {
