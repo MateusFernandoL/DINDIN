@@ -160,6 +160,7 @@ const obterExtrato = async (req, res) => {
     }
 }
 
+
 const excluirTransacao = async (req, res) => {
     const { id } = req.params;
     try {

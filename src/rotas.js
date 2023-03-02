@@ -6,10 +6,6 @@ const transacoes = require('./controladores/transacoes');
 
 const verificarUsuarioLogado = require('./intermediarios/autorizacao');
 
-
-
-//rotas
-
 rotas.post('/usuario', usuarios.cadastrarUsuario);
 rotas.post('/login', usuarios.login);
 
