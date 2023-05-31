@@ -34,21 +34,3 @@ Aqui estão os endpoints disponíveis na API:
 - `delete /transacao/:id` : Essa é a rota que será chamada quando o usuario logado quiser excluir uma das suas transações cadastradas.
 
 Para usar a API, envie solicitações HTTP para esses endpoints usando um cliente HTTP, como o [Postman](https://www.postman.com/) ou o [cURL](https://curl.se/).
-
-## Contribuindo
-
-Aceitamos contribuições para este projeto! Para contribuir, siga estas etapas:
-
-1. Fork este repositório
-2. Crie uma branch com a sua feature: `git checkout -b minha-feature`
-3. Faça commit das suas alterações: `git commit -m 'Minha nova feature'`
-4. Faça push para a branch: `git push origin minha-feature`
-5. Abra um Pull Request
-
-## Licença
-
-Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
-
-## Contato
-
-Se você tiver alguma dúvida ou sugestão sobre este projeto, sinta-se à vontade para entrar em contato comigo através do meu perfil no GitHub: [@MateusFernandoL](https://github.com/MateusFernandoL).
